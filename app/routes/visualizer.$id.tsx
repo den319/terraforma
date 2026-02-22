@@ -109,7 +109,7 @@ const VisualizerId = () => {
 
         hasInitialGenerated.current = true;
         void runGeneration(project);
-    }, [project, isProjectLoading]);
+    }, [project, isProjectLoading, runGeneration]);
 
     return (
         <div className="visualizer">

@@ -26,7 +26,11 @@ export const generate3DView = async ({ sourceImage }: Generate3DViewParams) => {
     const base64Data = dataUrl.split(',')[1];
     const mimeType = dataUrl.split(';')[0].split(':')[1];
 
-    if(!mimeType || !base64Data) throw new Error('Invalid source image payload');
+    if(!mimeType || !base64Data) 
+        {
+            return { renderedImage: null, renderedPath: undefined };
+            // throw new Error('Invalid source image payload');
+        }
 
     const response = await puter.ai.txt2img(TERRAFORMA_RENDER_PROMPT, {
         provider: "gemini",
