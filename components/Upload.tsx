@@ -78,9 +78,6 @@ const Upload = ({ onComplete }: UploadProps) => {
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault();
         if (!isSignedIn) {
-            toast.error("Sign in required", {
-                description: "Please sign in to upload files.",
-            });
             return;
         }
         setIsDragging(true);
