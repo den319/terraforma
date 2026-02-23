@@ -6,6 +6,7 @@ import Button from "../../components/ui/Button";
 import {createProject, getProjectById} from "../../lib/puter.action";
 import {ReactCompareSlider, ReactCompareSliderImage} from "react-compare-slider";
 import { generate3DView } from "lib/ai.action";
+import { toast } from "sonner";
 
 const VisualizerId = () => {
     const { id } = useParams();
@@ -22,7 +23,12 @@ const VisualizerId = () => {
 
     const handleBack = () => navigate('/');
     const handleExport = () => {
-        if (!currentImage) return;
+        if (!currentImage) {
+            toast.error("No image to export", {
+                description: "Please wait for the rendering to complete.",
+            });
+            return;
+        }
 
         const link = document.createElement('a');
         link.href = currentImage;
@@ -30,6 +36,10 @@ const VisualizerId = () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        
+        toast.success("Image exported", {
+            description: "Your image has been downloaded successfully.",
+        });
     }
 
     const runGeneration = async (item: DesignItem) => {
@@ -56,10 +66,24 @@ const VisualizerId = () => {
                 if(saved) {
                     setProject(saved);
                     setCurrentImage(saved.renderedImage || result.renderedImage);
+                    toast.success("Rendering complete", {
+                        description: "Your 3D visualization has been generated successfully.",
+                    });
+                } else {
+                    toast.error("Failed to save project", {
+                        description: "The rendering was generated but couldn't be saved.",
+                    });
                 }
+            } else {
+                toast.error("Rendering failed", {
+                    description: "Unable to generate 3D visualization. Please try again.",
+                });
             }
         } catch (error) {
-            console.error('Generation failed: ', error)
+            toast.error("Rendering failed", {
+                description: "An error occurred while generating the 3D visualization.",
+            });
+            console.error('Generation failed: ', error);
         } finally {
             setIsProcessing(false);
         }
@@ -76,14 +100,30 @@ const VisualizerId = () => {
 
             setIsProjectLoading(true);
 
-            const fetchedProject = await getProjectById({ id });
+            try {
+                const fetchedProject = await getProjectById({ id });
 
-            if (!isMounted) return;
+                if (!isMounted) return;
 
-            setProject(fetchedProject);
-            setCurrentImage(fetchedProject?.renderedImage || null);
-            setIsProjectLoading(false);
-            hasInitialGenerated.current = false;
+                if (!fetchedProject) {
+                    toast.error("Project not found", {
+                        description: "The requested project could not be loaded.",
+                    });
+                }
+
+                setProject(fetchedProject);
+                setCurrentImage(fetchedProject?.renderedImage || null);
+            } catch (error) {
+                if (!isMounted) return;
+                toast.error("Failed to load project", {
+                    description: "Unable to load the project. Please try again.",
+                });
+                console.error("Failed to load project:", error);
+            } finally {
+                if (!isMounted) return;
+                setIsProjectLoading(false);
+                hasInitialGenerated.current = false;
+            }
         };
 
         loadProject();
@@ -142,7 +182,11 @@ const VisualizerId = () => {
                             >
                                 <Download className="w-4 h-4 mr-2" /> Export
                             </Button>
-                            <Button size="sm" onClick={() => {}} className="share">
+                            <Button size="sm" onClick={() => {
+                                toast.info("Share feature coming soon", {
+                                    description: "The share functionality will be available in a future update.",
+                                });
+                            }} className="share">
                                 <Share2 className="w-4 h-4 mr-2" />
                                 Share
                             </Button>

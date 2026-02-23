@@ -6,6 +6,7 @@ import Upload from "components/Upload";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { createProject, getProjects } from "lib/puter.action";
+import { toast } from "sonner";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -21,7 +22,6 @@ export default function Home() {
 
     const handleUploadComplete = async (base64Image: string) => {
         try {
-
             if(isCreatingProjectRef.current) return false;
             isCreatingProjectRef.current = true;
             const newId = Date.now().toString();
@@ -36,7 +36,9 @@ export default function Home() {
             const saved = await createProject({ item: newItem, visibility: 'private' });
 
             if(!saved) {
-                console.error("Failed to create project");
+                toast.error("Failed to create project", {
+                    description: "Unable to save your project. Please try again.",
+                });
                 return false;
             }
 
@@ -58,9 +60,15 @@ export default function Home() {
 
     useEffect(() => {
         const fetchProjects = async () => {
-            const items = await getProjects();
-
-            setProjects(items)
+            try {
+                const items = await getProjects();
+                setProjects(items);
+            } catch (error) {
+                toast.error("Failed to load projects", {
+                    description: "Unable to load your projects. Please try again later.",
+                });
+                console.error("Failed to fetch projects:", error);
+            }
         }
 
         fetchProjects();
@@ -103,7 +111,7 @@ export default function Home() {
                     </div>
 
                     <h3>Upload your floor plan</h3>
-                    <p>Supports JPG, PNG, formats up to 10MB</p>
+                    <p>Supports JPG, PNG, WebP formats up to 50MB.</p>
                 </div>
 
                 <Upload onComplete={handleUploadComplete} />

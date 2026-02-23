@@ -1,5 +1,7 @@
 export const PUTER_WORKER_URL = import.meta.env.VITE_PUTER_WORKER_URL || "";
 
+export const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
+
 // Storage Paths
 export const STORAGE_PATHS = {
     ROOT: "terraforma",

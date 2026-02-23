@@ -1,7 +1,8 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useOutletContext} from "react-router";
 import {CheckCircle2, ImageIcon, UploadIcon} from "lucide-react";
-import {PROGRESS_INCREMENT, REDIRECT_DELAY_MS, PROGRESS_INTERVAL_MS} from "lib/constants";
+import {PROGRESS_INCREMENT, REDIRECT_DELAY_MS, PROGRESS_INTERVAL_MS, MAX_FILE_SIZE_BYTES} from "lib/constants";
+import { toast } from "sonner";
 
 interface UploadProps {
     onComplete?: (base64Data: string) => void;
@@ -32,11 +33,21 @@ const Upload = ({ onComplete }: UploadProps) => {
     const processFile = useCallback((file: File) => {
         if (!isSignedIn) return;
 
+        if(file.size > MAX_FILE_SIZE_BYTES) {
+            toast.error("File too large", {
+                description: `Maximum file size is 50 MB. Your file is ${(file.size / (1024 * 1024)).toFixed(2)} MB.`,
+            });
+            return;
+        }
+
         setFile(file);
         setProgress(0);
 
         const reader = new FileReader();
         reader.onerror = () => {
+            toast.error("File upload failed", {
+                description: "Failed to read the file. Please try again.",
+            });
             setFile(null);
             setProgress(0);
         };
@@ -66,7 +77,12 @@ const Upload = ({ onComplete }: UploadProps) => {
 
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault();
-        if (!isSignedIn) return;
+        if (!isSignedIn) {
+            toast.error("Sign in required", {
+                description: "Please sign in to upload files.",
+            });
+            return;
+        }
         setIsDragging(true);
     };
 
@@ -78,17 +94,33 @@ const Upload = ({ onComplete }: UploadProps) => {
         e.preventDefault();
         setIsDragging(false);
 
-        if (!isSignedIn) return;
+        if (!isSignedIn) {
+            toast.error("Sign in required", {
+                description: "Please sign in to upload files.",
+            });
+            return;
+        }
 
         const droppedFile = e.dataTransfer.files[0];
         const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-        if (droppedFile && allowedTypes.includes(droppedFile.type)) {
-            processFile(droppedFile);
+        if (droppedFile) {
+            if (allowedTypes.includes(droppedFile.type)) {
+                processFile(droppedFile);
+            } else {
+                toast.error("Invalid file type", {
+                    description: "Only JPG, PNG, and WebP files are supported.",
+                });
+            }
         }
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!isSignedIn) return;
+        if (!isSignedIn) {
+            toast.error("Sign in required", {
+                description: "Please sign in to upload files.",
+            });
+            return;
+        }
 
         const selectedFile = e.target.files?.[0];
         if (selectedFile) {
