@@ -17,9 +17,7 @@
 <div>
   <br />
   <div align="center">
-    <a href="https://youtu.be/JiwTGGGIhDs" target="_blank">
       <img src="public/readme-hero.png" alt="Project Banner" style="max-width:800px">
-    </a>
   </div>
   <br />
 </div>
