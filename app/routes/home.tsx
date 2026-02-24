@@ -10,8 +10,8 @@ import { toast } from "sonner";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "TerraForma" },
+    { name: "description", content: "3D visualizer tool" },
   ];
 }
 

@@ -10,7 +10,7 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 import { useEffect, useState } from "react";
-import { getCurrentUser, signIn as puterSignIn, signout as puterSignOut } from "lib/puter.action";
+import { getCurrentUser, signIn as puterSignIn, signout as puterSignOut} from "lib/puter.action";
 import { Toaster } from "sonner";
 
 export const links: Route.LinksFunction = () => [

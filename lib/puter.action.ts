@@ -3,13 +3,13 @@ import { PUTER_WORKER_URL } from "./constants";
 import { getOrCreateHostingConfig, uploadImageToHosting } from "./puter.hosting";
 import { isHostedUrl } from "./utils";
 
-export const signIn= async () => await puter.auth.signIn()
+export const signIn= async () => await puter.auth.signIn();
 
-export const signout= () => puter.auth.signOut()
+export const signout= () => puter.auth.signOut();
 
 export const getCurrentUser= async () => {
     try {
-        return await puter.auth.getUser();
+        return await puter.auth.getUser()
     } catch(error) {
         return null; 
     }
